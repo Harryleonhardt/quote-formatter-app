@@ -1,21 +1,17 @@
 import streamlit as st
 import pandas as pd
-import fitz  # pymupdf
+import pdfplumber
 import io
 import re
 
 # Function to extract text from uploaded PDF or text files
-def extract_text_from_file(uploaded_file):
-    if uploaded_file.type == "application/pdf":
-        text = ""
-        with fitz.open(stream=uploaded_file.read(), filetype="pdf") as doc:
-            for page in doc:
-                text += page.get_text()
-        return text
-    elif uploaded_file.type == "text/plain":
-        return uploaded_file.read().decode("utf-8")
-    else:
-        return ""
+def extract_text_from_pdf(file):
+    text = ""
+    with pdfplumber.open(file) as pdf:
+        for page in pdf.pages:
+            text += page.extract_text() + "\n"
+    return text
+
 
 # Function to parse quote lines from extracted text
 def parse_quote_lines(text):
